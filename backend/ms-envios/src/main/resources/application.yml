@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: ms-envios
+  datasource:
+    url: jdbc:mysql://localhost:5510/courier_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=America/Lima
+    username: app
+    password: password
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
+server:
+  port: 8081
+
+app:
+  jwt:
+    secret: "cibertec-courier-jwt-secret-key-2026-minimo-32-caracteres"
+    expiration-minutes: 60

@@ -1,0 +1,31 @@
+# Proyecto de Investigación Aplicada: Sistema de Gestion de Encomiendas y Courier
+
+## Información del Proyecto
+
+* Institución: CIBERTEC - Escuela de Tecnología
+* Carrera: Computación e Informatica
+* Curso: Desarrollo de Aplicaciones Web II (Sección 4697)
+* Ciclo: Sexto Ciclo
+* Entrega: Avance de Proyecto 1 (AP1)
+
+## Descripción General
+
+El presente proyecto consiste en el desarrollo de un sistema web empresarial orientado a la gestion logística y despacho de encomiendas. La solución permite el registro de paquetes, generación automática de códigos de seguimiento, control de estados de envió y autenticación segura de usuarios bajo roles de acceso definidos.
+
+## Arquitectura y Componentes
+
+El sistema esta diseñado sobre una arquitectura de servicios desacoplados:
+
+* Microservicio de Envíos (ms-envios): Modulo principal que gestiona la lógica de negocio, la persistencia de encomiendas, la administración de usuarios y la seguridad de acceso mediante tokens JWT.
+* Base de Datos: Motor relacional MySQL 8.0 administrado en contenedores Docker para asegurar la portabilidad y persistencia de datos.
+* Capa de Pruebas: Pruebas unitarias e integrales sobre las operaciones CRUD de la capa de datos implementadas con JUnit 5.
+
+## Tecnologías Empleadas
+
+* Java 17 y Spring Boot 3
+* Spring Data JPA y Hibernate
+* Spring Security con cifrado BCryptPasswordEncoder
+* Base de Datos Relacional MySQL 8.0 y Docker
+* JUnit 5 y Spring Boot Test
+* Project Lombok y Jakarta Validation
+
