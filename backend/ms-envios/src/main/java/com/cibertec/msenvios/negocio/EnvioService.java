@@ -2,6 +2,7 @@ package com.cibertec.msenvios.negocio;
 
 import com.cibertec.msenvios.dto.EnvioRequest;
 import com.cibertec.msenvios.dto.EnvioResponse;
+import com.cibertec.msenvios.dto.EventoTracking;
 import com.cibertec.msenvios.entidades.Envio;
 import com.cibertec.msenvios.repositorio.EnvioRepository;
 import org.springframework.http.HttpStatus;
@@ -16,9 +17,11 @@ import java.util.concurrent.ThreadLocalRandom;
 public class EnvioService {
 
 	private final EnvioRepository envioRepository;
+	private final TrackingEventProducer trackingEventProducer;
 
-	public EnvioService(EnvioRepository envioRepository) {
+	public EnvioService(EnvioRepository envioRepository, TrackingEventProducer trackingEventProducer) {
 		this.envioRepository = envioRepository;
+		this.trackingEventProducer = trackingEventProducer;
 	}
 
 	public List<EnvioResponse> listarTodos() {
@@ -57,6 +60,13 @@ public class EnvioService {
 				.build();
 
 		Envio guardado = envioRepository.save(envio);
+		trackingEventProducer.publicarEvento(new EventoTracking(
+				guardado.getCodigoTracking(),
+				guardado.getEstado(),
+				"Agencia de Envio",
+				"Envio recepcionado y registrado",
+				guardado.getFechaRegistro()
+		));
 		return mapToResponse(guardado);
 	}
 
@@ -66,6 +76,13 @@ public class EnvioService {
 
 		envio.setEstado(nuevoEstado);
 		Envio actualizado = envioRepository.save(envio);
+		trackingEventProducer.publicarEvento(new EventoTracking(
+				actualizado.getCodigoTracking(),
+				actualizado.getEstado(),
+				"Centro Logistico",
+				"El paquete cambio de estado a: " + nuevoEstado,
+				LocalDateTime.now()
+		));
 		return mapToResponse(actualizado);
 	}
 
