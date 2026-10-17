@@ -10,6 +10,52 @@ services:
       RABBITMQ_DEFAULT_PASS: guest
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - courier-net
+
+  api-gateway:
+    build:
+      context: ./backend/api-gateway
+    container_name: courier-api-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      - ENVIOS_URL=http://ms-envios:8081
+      - TRACKING_URL=http://ms-tracking:8082
+    depends_on:
+      - ms-envios
+      - ms-tracking
+    networks:
+      - courier-net
+
+  ms-envios:
+    build:
+      context: ./backend/ms-envios
+    container_name: courier-ms-envios
+    ports:
+      - "8081:8081"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysqldb:3306/courier_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=America/Lima
+      - SPRING_RABBITMQ_HOST=rabbitmq
+    networks:
+      - courier-net
+
+  ms-tracking:
+    build:
+      context: ./backend/ms-tracking
+    container_name: courier-ms-tracking
+    ports:
+      - "8082:8082"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysqldb:3306/courier_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=America/Lima
+      - SPRING_RABBITMQ_HOST=rabbitmq
+      - APP_ENVIOS_SERVICE_URL=http://ms-envios:8081
+    networks:
+      - courier-net
 
 volumes:
   rabbitmq_data:
+
+networks:
+  courier-net:
+    driver: bridge

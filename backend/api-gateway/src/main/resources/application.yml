@@ -1,0 +1,38 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins:
+              - "http://localhost:4200"
+              - "http://localhost:80"
+              - "http://localhost"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders: "*"
+            allowCredentials: true
+      routes:
+        - id: ms-envios-auth
+          uri: ${ENVIOS_URL:http://localhost:8081}
+          predicates:
+            - Path=/api/auth/**
+
+        - id: ms-envios-crud
+          uri: ${ENVIOS_URL:http://localhost:8081}
+          predicates:
+            - Path=/api/envios/**
+
+        - id: ms-tracking
+          uri: ${TRACKING_URL:http://localhost:8082}
+          predicates:
+            - Path=/api/tracking/**
