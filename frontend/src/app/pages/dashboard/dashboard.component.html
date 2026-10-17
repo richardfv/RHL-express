@@ -1,0 +1,330 @@
+<div class="dash-layout">
+  <header class="dash-navbar">
+    <div class="dash-container nav-inner">
+      <div class="brand-side">
+        <a routerLink="/" class="dash-brand">
+          <img src="assets/images/rhl logo.jpg" alt="RHL Express" class="dash-logo" />
+        </a>
+        @if (isAdmin()) {
+          <span class="portal-badge badge-admin">🛡️ Administrador Master</span>
+        } @else {
+          <span class="portal-badge badge-operador">🚚 Operador de Agencia</span>
+        }
+      </div>
+
+      <div class="user-side">
+        <div class="user-info">
+          <span class="user-name">{{ authService.currentUser() || 'Colaborador' }}</span>
+          @if (isAdmin()) {
+            <span class="user-role role-admin">🛡️ Administrador (Control Total)</span>
+          } @else {
+            <span class="user-role role-operador">🚚 Operador (Gestión Envíos)</span>
+          }
+        </div>
+        <button (click)="authService.logout()" class="rhl-btn rhl-btn-outline btn-logout">
+          <span>Cerrar Sesión</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="dash-container main-content">
+    <div class="dash-header">
+      <div>
+        <h1 class="dash-title">Gestión de Encomiendas & Despachos</h1>
+        <p class="dash-desc">Monitoreo, registro y actualización en tiempo real de la red logística nacional.</p>
+      </div>
+      <button (click)="abrirCrearModal()" class="rhl-btn rhl-btn-red btn-new-envio">
+        <span>+ Registrar Nuevo Envío</span>
+      </button>
+    </div>
+
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-icon total">📦</div>
+        <div class="metric-data">
+          <span class="metric-label">Total Envíos</span>
+          <strong class="metric-value">{{ totalEnvios() }}</strong>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-icon transit">🚛</div>
+        <div class="metric-data">
+          <span class="metric-label">En Tránsito</span>
+          <strong class="metric-value">{{ enTransito() }}</strong>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-icon delivered">✅</div>
+        <div class="metric-data">
+          <span class="metric-label">Entregados</span>
+          <strong class="metric-value">{{ entregados() }}</strong>
+        </div>
+      </div>
+
+      @if (isAdmin()) {
+        <div class="metric-card highlight-revenue">
+          <div class="metric-icon revenue">💰</div>
+          <div class="metric-data">
+            <span class="metric-label">Recaudación Total (Admin)</span>
+            <strong class="metric-value">S/. {{ recaudacion() | number:'1.2-2' }}</strong>
+          </div>
+        </div>
+      } @else {
+        <div class="metric-card">
+          <div class="metric-icon pending">⏳</div>
+          <div class="metric-data">
+            <span class="metric-label">Pendientes de Entrega</span>
+            <strong class="metric-value">{{ pendientes() }}</strong>
+          </div>
+        </div>
+      }
+    </div>
+
+    <div class="table-toolbar">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input
+          type="text"
+          [ngModel]="searchTerm()"
+          (ngModelChange)="searchTerm.set($event)"
+          placeholder="Buscar por código, remitente, destino o destinatario..."
+          class="search-input"
+        />
+      </div>
+
+      <div class="filter-wrap">
+        <label>Estado:</label>
+        <select [ngModel]="filterEstado()" (ngModelChange)="filterEstado.set($event)" class="filter-select">
+          <option value="TODOS">Todos los Estados</option>
+          <option value="REGISTRADO">Registrado</option>
+          <option value="EN_TRANSITO">En Tránsito</option>
+          <option value="EN_SUCURSAL">En Sucursal</option>
+          <option value="ENTREGADO">Entregado</option>
+          <option value="CANCELADO">Cancelado</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="table-card">
+      @if (isLoading()) {
+        <div class="loading-state">
+          <span class="spinner"></span> Cargando base de datos de encomiendas...
+        </div>
+      } @else if (errorMessage()) {
+        <div class="error-state">
+          <p>{{ errorMessage() }}</p>
+          <button (click)="cargarEnvios()" class="rhl-btn rhl-btn-outline">Reintentar</button>
+        </div>
+      } @else if (enviosFiltrados().length === 0) {
+        <div class="empty-state">
+          <div class="empty-icon">📭</div>
+          <h3>No se encontraron envíos</h3>
+          <p>Intenta cambiar los términos de búsqueda o registra un nuevo envío.</p>
+        </div>
+      } @else {
+        <div class="table-responsive">
+          <table class="rhl-table">
+            <thead>
+              <tr>
+                <th>Código</th>
+                <th>Remitente</th>
+                <th>Destinatario</th>
+                <th>Ruta</th>
+                <th>Peso</th>
+                <th>Tarifa</th>
+                <th>Estado</th>
+                <th class="text-right">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of enviosFiltrados(); track item.id) {
+                <tr>
+                  <td>
+                    <strong class="code-link">{{ item.codigoTracking }}</strong>
+                  </td>
+                  <td>
+                    {{ item.remitente }}
+                    @if (item.dniRemitente) {
+                      <br /><small class="text-muted">DNI: {{ item.dniRemitente }}</small>
+                    }
+                  </td>
+                  <td>{{ item.destinatario }}</td>
+                  <td>
+                    <span class="route-tag">Lima ➔ {{ item.ciudadDestino }}</span>
+                  </td>
+                  <td>{{ item.peso }} Kg</td>
+                  <td>
+                    <strong>S/. {{ item.costo | number:'1.2-2' }}</strong>
+                  </td>
+                  <td>
+                    <span class="badge-status" [ngClass]="item.estado">
+                      {{ item.estado }}
+                    </span>
+                  </td>
+                  <td class="text-right actions-cell">
+                    <button (click)="abrirEditarModal(item)" class="btn-action edit" title="Modificar Estado">
+                      ✏️ Estado
+                    </button>
+                    @if (isAdmin()) {
+                      <button (click)="abrirEliminarModal(item)" class="btn-action delete" title="Anular Encomienda">
+                        🗑️
+                      </button>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  </main>
+</div>
+
+@if (showCreateModal()) {
+  <div class="modal-backdrop">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3>Registrar Nueva Encomienda</h3>
+        <button (click)="showCreateModal.set(false)" class="close-btn">&times;</button>
+      </div>
+
+      <form [formGroup]="createForm" (ngSubmit)="guardarNuevoEnvio()" class="modal-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Remitente *</label>
+            <input type="text" formControlName="remitente" placeholder="Ej. Juan Pérez / Empresa SAC" class="form-control" />
+          </div>
+          <div class="form-group">
+            <label>DNI Remitente (8 dígitos) *</label>
+            <input type="text" maxlength="8" formControlName="dniRemitente" placeholder="99999999" class="form-control" />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Destinatario *</label>
+            <input type="text" formControlName="destinatario" placeholder="Ej. María Delgado" class="form-control" />
+          </div>
+          <div class="form-group">
+            <label>Ciudad de Destino *</label>
+            <select formControlName="ciudadDestino" class="form-control">
+              <option value="Lima">Lima</option>
+              <option value="Arequipa">Arequipa</option>
+              <option value="Trujillo">Trujillo</option>
+              <option value="Cusco">Cusco</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Dirección de Destino *</label>
+            <input type="text" formControlName="direccionDestino" placeholder="Ej. Av. Los Laureles 999" class="form-control" />
+          </div>
+          <div class="form-group">
+            <label>Peso (Kg) *</label>
+            <input type="number" step="0.1" formControlName="peso" placeholder="Ej. 2.5" class="form-control" />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Costo de Envío (S/.) *</label>
+            <input type="number" step="0.5" formControlName="costo" placeholder="Ej. 35.00" class="form-control" />
+          </div>
+          <div class="form-group">
+            <label>Tipo de Contenido *</label>
+            <select formControlName="categoriaContenido" class="form-control">
+              <option value="Documentos y Trámites">Documentos y Trámites</option>
+              <option value="Equipos Electrónicos y Cómputo">Equipos Electrónicos y Cómputo</option>
+              <option value="Prendas de Vestir y Calzado">Prendas de Vestir y Calzado</option>
+              <option value="Medicinas y Cuidado Personal">Medicinas y Cuidado Personal</option>
+              <option value="Repuestos y Herramientas">Repuestos y Herramientas</option>
+              <option value="Paquetería General">Paquetería General</option>
+              <option value="OTRO">OTRO (Especificar descripción)</option>
+            </select>
+          </div>
+        </div>
+
+        @if (createForm.get('categoriaContenido')?.value === 'OTRO') {
+          <div class="form-group custom-desc-box">
+            <label>Descripción Detallada del Contenido *</label>
+            <input
+              type="text"
+              formControlName="descripcionOtro"
+              placeholder="Ej. Artesanías de cerámica / Muestras textiles"
+              class="form-control"
+            />
+          </div>
+        }
+
+        <div class="modal-footer">
+          <button type="button" (click)="showCreateModal.set(false)" class="rhl-btn rhl-btn-outline">Cancelar</button>
+          <button type="submit" class="rhl-btn rhl-btn-red">Guardar y Despachar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+
+@if (showEditModal()) {
+  <div class="modal-backdrop">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3>Actualizar Estado - {{ selectedEnvio()?.codigoTracking }}</h3>
+        <button (click)="showEditModal.set(false)" class="close-btn">&times;</button>
+      </div>
+
+      <form [formGroup]="editForm" (ngSubmit)="guardarEdicion()" class="modal-body">
+        <div class="form-group">
+          <label>Nuevo Estado Operativo *</label>
+          <select formControlName="estado" class="form-control">
+            <option value="REGISTRADO">REGISTRADO (En almacén origen)</option>
+            <option value="EN_TRANSITO">EN TRANSITO (En ruta terrestre)</option>
+            <option value="EN_SUCURSAL">EN SUCURSAL (Listo para retiro o reparto)</option>
+            <option value="ENTREGADO">ENTREGADO (Recepcionado por cliente)</option>
+            <option value="CANCELADO">CANCELADO / DEVUELTO</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Comentario u Observación</label>
+          <textarea formControlName="notas" rows="3" class="form-control" placeholder="Ej. Paquete subido a unidad móvil RHL-820..."></textarea>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" (click)="showEditModal.set(false)" class="rhl-btn rhl-btn-outline">Cancelar</button>
+          <button type="submit" class="rhl-btn rhl-btn-primary">Actualizar Hito</button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+
+@if (showDeleteModal()) {
+  <div class="modal-backdrop">
+    <div class="modal-dialog delete-dialog">
+      <div class="modal-header">
+        <h3>Confirmar Anulación</h3>
+        <button (click)="showDeleteModal.set(false)" class="close-btn">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <p class="delete-warning">
+          ⚠️ ¿Estás seguro de que deseas anular y eliminar la encomienda <strong>{{ selectedEnvio()?.codigoTracking }}</strong>?
+        </p>
+        <p class="delete-sub">Esta acción removerá el registro del servidor y no podrá ser rastreado por el cliente.</p>
+
+        <div class="modal-footer">
+          <button type="button" (click)="showDeleteModal.set(false)" class="rhl-btn rhl-btn-outline">Cancelar</button>
+          <button type="button" (click)="confirmarEliminar()" class="rhl-btn rhl-btn-red">Sí, Anular Envío</button>
+        </div>
+      </div>
+    </div>
+  </div>
+}

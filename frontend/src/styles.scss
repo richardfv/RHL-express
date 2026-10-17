@@ -1,0 +1,149 @@
+@import url('https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --rhl-yellow: #FCC902;
+  --rhl-yellow-hover: #E5B502;
+  --rhl-yellow-light: #FFF9DB;
+  --rhl-red: #D40511;
+  --rhl-red-hover: #B7040E;
+  --rhl-red-light: #FEE2E2;
+  --rhl-dark: #111827;
+  --rhl-dark-card: #1F2937;
+  --rhl-gray-light: #F8FAFC;
+  --rhl-gray-border: #E2E8F0;
+  --rhl-text-main: #0F172A;
+  --rhl-text-muted: #64748B;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: var(--rhl-text-main);
+  background-color: #FFFFFF;
+}
+
+body {
+  min-height: 100vh;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Barlow', 'Inter', sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button, input, select, textarea {
+  font-family: inherit;
+}
+
+/* Clases Utilitarias RHL */
+.rhl-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-family: 'Barlow', sans-serif;
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.65rem 1.4rem;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+.rhl-btn-primary {
+  background-color: var(--rhl-yellow);
+  color: var(--rhl-red);
+  box-shadow: 0 2px 4px rgba(212, 5, 17, 0.15);
+
+  &:hover {
+    background-color: var(--rhl-yellow-hover);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  }
+}
+
+.rhl-btn-red {
+  background-color: var(--rhl-red);
+  color: #FFFFFF;
+
+  &:hover {
+    background-color: var(--rhl-red-hover);
+    box-shadow: 0 4px 12px rgba(212, 5, 17, 0.3);
+  }
+}
+
+.rhl-btn-dark {
+  background-color: var(--rhl-dark);
+  color: #FFFFFF;
+
+  &:hover {
+    background-color: #000000;
+  }
+}
+
+.rhl-btn-outline {
+  background-color: transparent;
+  color: var(--rhl-dark);
+  border: 1.5px solid var(--rhl-gray-border);
+
+  &:hover {
+    background-color: var(--rhl-gray-light);
+    border-color: #CBD5E1;
+  }
+}
+
+.badge-status {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+
+  &.REGISTRADO {
+    background-color: #E0E7FF;
+    color: #3730A3;
+  }
+  &.EN_TRANSITO {
+    background-color: #FEF3C7;
+    color: #92400E;
+  }
+  &.EN_SUCURSAL {
+    background-color: #E0F2FE;
+    color: #0369A1;
+  }
+  &.ENTREGADO {
+    background-color: #DCFCE7;
+    color: #166534;
+  }
+  &.CANCELADO {
+    background-color: #FEE2E2;
+    color: #991B1B;
+  }
+}

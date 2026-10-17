@@ -1,0 +1,570 @@
+<div class="rhl-topbar">
+  <div class="rhl-container topbar-content">
+    <div class="topbar-left">
+      <span><i class="icon">📞</i> Central Nacional: <strong>(01) 358 3088 RHL-EXP</strong></span>
+      <span class="sep">•</span>
+      <span><i class="icon">📍</i> Cobertura en las 25 regiones del Perú</span>
+    </div>
+    <div class="topbar-right">
+      <a (click)="irATrabajaConNosotros()" class="topbar-link">
+        <span class="icon">💼</span> Trabaja con Nosotros
+      </a>
+      <span class="sep">•</span>
+      <span><i class="icon">🕒</i> Lun - Sáb: 07:30 - 20:30 hrs</span>
+    </div>
+  </div>
+</div>
+
+<header class="rhl-navbar">
+  <div class="rhl-container navbar-inner">
+    <a routerLink="/" class="navbar-brand">
+      <img src="assets/images/rhl logo.jpg" alt="RHL Express Logo" class="brand-logo" />
+    </a>
+
+    <nav class="navbar-links">
+      <a href="#rastreo" class="nav-item">Rastreo</a>
+      <a href="#servicios" class="nav-item">Servicios</a>
+      <a href="#agencias" class="nav-item">Agencias</a>
+      <a href="#nosotros" class="nav-item">Nosotros</a>
+      <a href="#faq" class="nav-item">Preguntas</a>
+      <a href="#contacto" class="nav-item">Contacto</a>
+    </nav>
+
+    <div class="navbar-cta">
+      <a routerLink="/login" class="rhl-btn rhl-btn-red navbar-login-btn">
+        <span>Acceso Colaboradores</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg>
+      </a>
+    </div>
+  </div>
+</header>
+
+<section class="rhl-hero" id="rastreo">
+  <div class="hero-bg-overlay"></div>
+  <div class="rhl-container hero-grid">
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span class="dot"></span> Líder en Envíos & Transporte Terrestre
+      </div>
+      <h1 class="hero-title">
+        La Red Logística Más Rápida <br /><span class="highlight-text">Y Segura del País</span>
+      </h1>
+      <p class="hero-description">
+        Conectamos personas, empresas y comercios a lo largo de todo el territorio nacional con la máxima puntualidad, tecnología de trazabilidad en vivo y el respaldo corporativo de RHL Express.
+      </p>
+
+      <div class="hero-tracking-card">
+        <div class="card-label">
+          <span class="pin-icon">📦</span> RASTREO DE ENCOMIENDA EN VIVO
+        </div>
+        <div class="tracking-input-group">
+          <input
+            type="text"
+            [(ngModel)]="searchCode"
+            placeholder="Ingresa tu código (Ej: ENV-1001)"
+            (keyup.enter)="buscarTracking()"
+            class="tracking-input"
+          />
+          <button
+            (click)="buscarTracking()"
+            [disabled]="isSearching()"
+            class="rhl-btn rhl-btn-red tracking-btn"
+          >
+            @if (isSearching()) {
+              <span class="spinner"></span> Consultando...
+            } @else {
+              <span>Rastrear Envío</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            }
+          </button>
+        </div>
+
+        <div class="quick-codes">
+          <span class="quick-title">Envíos frecuentes:</span>
+          <button (click)="buscarTracking('ENV-1001')" class="code-pill">ENV-1001</button>
+          <button (click)="buscarTracking('ENV-1002')" class="code-pill">ENV-1002</button>
+          <button (click)="buscarTracking('ENV-1003')" class="code-pill">ENV-1003</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-image-wrapper">
+      <div class="truck-card">
+        <img src="assets/images/camion.jpg" alt="Camión de Carga RHL Express" class="truck-img" />
+        <div class="truck-tag">
+          <span class="icon">🚛</span> Flota RHL Mercedes-Benz con Monitoreo GPS 24/7
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+@if (trackingResult() || searchError()) {
+  <section class="tracking-result-section" id="resultado-rastreo">
+    <div class="rhl-container">
+      @if (searchError()) {
+        <div class="error-banner">
+          <span class="alert-icon">⚠️</span>
+          <p>{{ searchError() }}</p>
+        </div>
+      }
+
+      @if (trackingResult(); as data) {
+        <div class="result-card">
+          <div class="result-header">
+            <div>
+              <div class="result-subtitle">RESULTADO DEL RASTREO</div>
+              <h2 class="result-title">{{ data.codigoTracking }}</h2>
+            </div>
+            <div class="header-badges">
+              <span class="badge-status" [ngClass]="data.estadoActual">
+                {{ data.estadoActual }}
+              </span>
+            </div>
+          </div>
+
+          <div class="stepper-wrapper">
+            <div class="stepper-bar-bg">
+              <div class="stepper-bar-fill" [style.width.%]="getStepProgress(data.estadoActual)"></div>
+            </div>
+            <div class="stepper-steps">
+              <div class="step-item" [class.completed]="getStepProgress(data.estadoActual) >= 25">
+                <div class="step-circle">1</div>
+                <div class="step-label">Registrado</div>
+              </div>
+              <div class="step-item" [class.completed]="getStepProgress(data.estadoActual) >= 50">
+                <div class="step-circle">2</div>
+                <div class="step-label">En Tránsito</div>
+              </div>
+              <div class="step-item" [class.completed]="getStepProgress(data.estadoActual) >= 75">
+                <div class="step-circle">3</div>
+                <div class="step-label">En Sucursal</div>
+              </div>
+              <div class="step-item" [class.completed]="getStepProgress(data.estadoActual) >= 100">
+                <div class="step-circle">4</div>
+                <div class="step-label">Entregado</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="envio-details-grid">
+            <div class="detail-box">
+              <span class="label">Remitente</span>
+              <strong class="value">{{ data.remitente }}</strong>
+            </div>
+            <div class="detail-box">
+              <span class="label">Destinatario</span>
+              <strong class="value">{{ data.destinatario }}</strong>
+            </div>
+            <div class="detail-box">
+              <span class="label">Ciudad Destino</span>
+              <strong class="value">{{ data.ciudadDestino }}</strong>
+            </div>
+            <div class="detail-box">
+              <span class="label">Estado del Paquete</span>
+              <strong class="value">{{ data.estadoActual }}</strong>
+            </div>
+            <div class="telemetry-bar" [class.degraded]="data.observacionResiliencia?.includes('Circuit Breaker')">
+              <div class="telemetry-indicator">
+                <span class="pulse-dot"></span>
+                <span class="telemetry-title">
+                  @if (data.observacionResiliencia?.includes('Circuit Breaker')) {
+                    Modo Resiliente Activo (Resilience4j Circuit Breaker)
+                  } @else {
+                    Canal Sincrónico Operativo (Spring Cloud OpenFeign)
+                  }
+                </span>
+              </div>
+              <span class="telemetry-detail">{{ data.observacionResiliencia || 'Conexión estable con la red logística RHL' }}</span>
+            </div>
+          </div>
+
+          <div class="history-section">
+            <h3 class="history-title">Cronología de Eventos y Movimientos</h3>
+            <div class="timeline">
+              @for (h of data.historial; track h.id) {
+                <div class="timeline-row">
+                  <div class="time-col">
+                    <span class="date">{{ h.fechaRegistro | date:'dd/MM/yyyy HH:mm' }}</span>
+                  </div>
+                  <div class="dot-col">
+                    <div class="marker"></div>
+                  </div>
+                  <div class="desc-col">
+                    <div class="status-name">{{ h.estado }} - <span class="loc">{{ h.ubicacion }}</span></div>
+                    <p class="comment">{{ h.comentario }}</p>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </section>
+}
+
+<section class="rhl-section" id="servicios">
+  <div class="rhl-container">
+    <div class="section-heading text-center">
+      <span class="sub-badge">SOLUCIONES A TU MEDIDA</span>
+      <h2 class="section-title">Servicios de Encomiendas y Logística RHL</h2>
+      <p class="section-desc">Tecnología de punta, tiempos récord y una flota moderna para particulares y empresas.</p>
+    </div>
+
+    <div class="services-grid">
+      <div class="service-card">
+        <div class="card-img-wrap">
+          <img src="assets/images/camioneta.jpg" alt="RHL Express 24 Horas" />
+          <span class="service-pill">Urgente</span>
+        </div>
+        <div class="card-body">
+          <h3>RHL Express 24h</h3>
+          <p>Entrega prioritaria puerta a puerta entre las principales ciudades del Perú en menos de 24 horas con seguimiento satelital.</p>
+          <ul class="features-list">
+            <li>✓ Cobertura interprovincial directa</li>
+            <li>✓ Notificaciones por SMS y WhatsApp</li>
+            <li>✓ Recojo a domicilio corporativo</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="service-card">
+        <div class="card-img-wrap">
+          <img src="assets/images/contenedor.jpg" alt="Carga Nacional y Contenedores" />
+          <span class="service-pill">Industrial</span>
+        </div>
+        <div class="card-body">
+          <h3>Carga Masiva & Contenedores</h3>
+          <p>Transporte de grandes volúmenes, pallets y mercadería pesada con nuestra flota de semirremolques y furgones sellados.</p>
+          <ul class="features-list">
+            <li>✓ Carga consolidada y completa (FTL/LTL)</li>
+            <li>✓ Póliza de seguro total contra todo riesgo</li>
+            <li>✓ Gestión en puertos y aduanas</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="service-card">
+        <div class="card-img-wrap">
+          <img src="assets/images/local por fuera.jpg" alt="Red de Agencias y Sucursales" />
+          <span class="service-pill">Nacional</span>
+        </div>
+        <div class="card-body">
+          <h3>Red de Agencias & Almacén</h3>
+          <p>Más de 80 puntos de atención estratégica a nivel nacional para depósito, retiro rápido y custodia de mercadería.</p>
+          <ul class="features-list">
+            <li>✓ Embalaje especializado de cortesía</li>
+            <li>✓ Horarios extendidos de lunes a sábado</li>
+            <li>✓ Módulos de autoservicio y pago digital</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="rhl-section bg-gray" id="agencias">
+  <div class="rhl-container">
+    <div class="section-heading text-center">
+      <span class="sub-badge">PRESENCIA NACIONAL</span>
+      <h2 class="section-title">Nuestras Agencias y Puntos de Atención</h2>
+      <p class="section-desc">Instalaciones modernas equipadas con la última tecnología de pesaje y despacho.</p>
+    </div>
+
+    <div class="agencias-grid">
+      @for (ag of agencias; track ag.ciudad) {
+        <div class="agencia-card">
+          <div class="agencia-img-wrap">
+            <img [src]="ag.imagen" [alt]="ag.ciudad" />
+            <span class="agencia-badge">{{ ag.badge }}</span>
+          </div>
+          <div class="agencia-body">
+            <span class="agencia-ciudad">{{ ag.ciudad }}</span>
+            <h4 class="agencia-sede">{{ ag.sede }}</h4>
+            <div class="agencia-meta">
+              <p>📍 {{ ag.direccion }}</p>
+              <p>🕒 {{ ag.horario }}</p>
+              <p>📞 {{ ag.telefono }}</p>
+            </div>
+            <div class="agencia-status">
+              <span class="dot-open"></span> Abierto para atención al público
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</section>
+
+<section class="rhl-section" id="nosotros">
+  <div class="rhl-container about-grid">
+    <div class="about-image-column">
+      <div class="image-stack">
+        <img src="assets/images/trabajadores.jpg" alt="Equipo RHL Express" class="img-main" />
+        <div class="experience-card">
+          <span class="exp-number">15+</span>
+          <span class="exp-text">Años de excelencia logística en el Perú</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="about-content-column">
+      <span class="sub-badge">QUIÉNES SOMOS</span>
+      <h2 class="section-title">El Estándar Internacional en Courier Nacional</h2>
+      <p class="about-lead">
+        Inspirados en los estándares más rigurosos de la logística alemana, en <strong>RHL Express</strong> combinamos precisión operativa, una cultura de integridad y la flota de transporte más moderna del país.
+      </p>
+
+      <div class="values-list">
+        <div class="value-item">
+          <div class="value-icon">⏱️</div>
+          <div>
+            <h4>Puntualidad Absoluta</h4>
+            <p>Más del 98.7% de nuestras encomiendas llegan a destino antes o en la fecha pactada.</p>
+          </div>
+        </div>
+
+        <div class="value-item">
+          <div class="value-icon">🛡️</div>
+          <div>
+            <h4>Seguridad & Custodia</h4>
+            <p>Monitoreo satelital GPS en tiempo real de cada vehículo con escolta de seguridad en rutas nacionales.</p>
+          </div>
+        </div>
+
+        <div class="value-item">
+          <div class="value-icon">🤝</div>
+          <div>
+            <h4>Cercanía & Transparencia</h4>
+            <p>Sin tarifas ocultas ni trámites burocráticos. Trazabilidad transparente desde el origen hasta el destinatario.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="rhl-section bg-gray" id="faq">
+  <div class="rhl-container max-w-4xl">
+    <div class="section-heading text-center">
+      <span class="sub-badge">RESUELVE TUS DUDAS</span>
+      <h2 class="section-title">Preguntas Frecuentes</h2>
+      <p class="section-desc">Todo lo que necesitas saber antes de enviar tu encomienda con RHL Express.</p>
+    </div>
+
+    <div class="faq-accordion">
+      @for (faq of faqs; track faq.q; let i = $index) {
+        <div class="faq-item" [class.open]="activeFaq() === i">
+          <button class="faq-question" (click)="toggleFaq(i)">
+            <span>{{ faq.q }}</span>
+            <span class="arrow-icon">{{ activeFaq() === i ? '▲' : '▼' }}</span>
+          </button>
+          @if (activeFaq() === i) {
+            <div class="faq-answer">
+              <p>{{ faq.a }}</p>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</section>
+
+<section class="rhl-section" id="contacto">
+  <div class="rhl-container contact-wrapper">
+    <div class="contact-info">
+      <span class="sub-badge">ESTAMOS PARA AYUDARTE</span>
+      <h2 class="section-title">Contáctate con Nuestra Central RHL</h2>
+      <p>¿Tienes dudas sobre una tarifa corporativa o requieres asesoría para envío de gran volumen? Nuestro equipo de ejecutivos se comunicará contigo de inmediato.</p>
+
+      <div class="contact-methods">
+        <div class="method-card">
+          <span class="icon">📍</span>
+          <div>
+            <strong>Oficina Central:</strong>
+            <p>Av. José Pardo 840, Miraflores, Lima</p>
+          </div>
+        </div>
+        <div class="method-card">
+          <span class="icon">✉️</span>
+          <div>
+            <strong>Correo Corporativo:</strong>
+            <p>contacto&#64;rhlexpress.pe</p>
+          </div>
+        </div>
+        <div class="method-card">
+          <span class="icon">⏰</span>
+          <div>
+            <strong>Atención al Cliente:</strong>
+            <p>Lunes a Sábado de 07:30 a 20:30 hrs</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="contact-form-card">
+      <h3 class="form-title">Envíanos un Mensaje</h3>
+      <p class="form-subtitle">Completa el formulario y te responderemos en menos de 2 horas hábiles.</p>
+
+      @if (contactSubmitted()) {
+        <div class="alert-success-card">
+          <div class="success-icon">✓</div>
+          <h4>¡Solicitud Registrada con Éxito!</h4>
+          <p class="ticket-tag">Código de Ticket: <strong>#{{ contactTicket() }}</strong></p>
+          <p class="ticket-desc">
+            Tu consulta sobre <strong>{{ contactForm.get('asunto')?.value }}</strong> ha sido recibida en nuestra central de atención. Nos comunicaremos contigo a la brevedad.
+          </p>
+          <button type="button" (click)="nuevaConsulta()" class="rhl-btn rhl-btn-outline btn-new-ticket">
+            <span>Enviar otra consulta</span>
+          </button>
+        </div>
+      } @else {
+        <form [formGroup]="contactForm" (ngSubmit)="enviarContacto()">
+          <div class="form-group">
+            <label>Nombre y Apellidos *</label>
+            <input
+              type="text"
+              formControlName="nombre"
+              placeholder="Ej. Carlos Mendoza"
+              class="form-control"
+              [class.is-invalid]="contactForm.get('nombre')?.touched && contactForm.get('nombre')?.invalid"
+            />
+            @if (contactForm.get('nombre')?.touched && contactForm.get('nombre')?.invalid) {
+              <small class="field-error">Ingresa tu nombre completo (mínimo 3 caracteres).</small>
+            }
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Correo Electrónico *</label>
+              <input
+                type="email"
+                formControlName="email"
+                placeholder="carlos@empresa.pe"
+                class="form-control"
+                [class.is-invalid]="contactForm.get('email')?.touched && contactForm.get('email')?.invalid"
+              />
+              @if (contactForm.get('email')?.touched && contactForm.get('email')?.invalid) {
+                <small class="field-error">Ingresa un correo electrónico válido.</small>
+              }
+            </div>
+            <div class="form-group">
+              <label>Teléfono / Celular *</label>
+              <input
+                type="text"
+                formControlName="telefono"
+                placeholder="987 654 321"
+                class="form-control"
+                [class.is-invalid]="contactForm.get('telefono')?.touched && contactForm.get('telefono')?.invalid"
+              />
+              @if (contactForm.get('telefono')?.touched && contactForm.get('telefono')?.invalid) {
+                <small class="field-error">Ingresa un teléfono válido.</small>
+              }
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Motivo de Consulta *</label>
+            <select formControlName="asunto" class="form-control">
+              <option value="Cotización de Envío Empresarial">Cotización de Envío Empresarial</option>
+              <option value="Consulta sobre Encomienda">Consulta sobre Encomienda</option>
+              <option value="Convenio Logístico para eCommerce">Convenio Logístico para eCommerce</option>
+              <option value="Bolsa de Trabajo / Trabaja con Nosotros">Bolsa de Trabajo / Postulación Laboral</option>
+              <option value="Reclamo o Sugerencia">Reclamo o Sugerencia</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Mensaje Detallado *</label>
+            <textarea
+              formControlName="mensaje"
+              rows="4"
+              placeholder="Describe tu requerimiento (origen, destino, tipo de carga)..."
+              class="form-control"
+              [class.is-invalid]="contactForm.get('mensaje')?.touched && contactForm.get('mensaje')?.invalid"
+            ></textarea>
+            @if (contactForm.get('mensaje')?.touched && contactForm.get('mensaje')?.invalid) {
+              <small class="field-error">Describe tu requerimiento (mínimo 10 caracteres).</small>
+            }
+          </div>
+
+          <button type="submit" [disabled]="isSendingContact()" class="rhl-btn rhl-btn-red w-full">
+            @if (isSendingContact()) {
+              <span>Enviando mensaje...</span>
+            } @else {
+              <span>Enviar Consulta</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            }
+          </button>
+        </form>
+      }
+    </div>
+  </div>
+</section>
+
+<footer class="rhl-footer">
+  <div class="rhl-container footer-grid">
+    <div class="footer-col brand-col">
+      <img src="assets/images/rhl logo.jpg" alt="RHL Logo" class="footer-logo" />
+      <p class="brand-desc">
+        RHL Express es la red líder de courier, encomiendas y logística de distribución integral en todo el Perú. Compromiso, puntualidad y excelencia operativa.
+      </p>
+      <div class="social-icons">
+        <a href="#" class="social-circle" title="Facebook">
+          <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+        </a>
+        <a href="#" class="social-circle" title="Instagram">
+          <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+        </a>
+        <a href="#" class="social-circle" title="LinkedIn">
+          <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+        </a>
+        <a href="#" class="social-circle" title="YouTube">
+          <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+        </a>
+      </div>
+    </div>
+
+    <div class="footer-col">
+      <h4 class="footer-heading">Servicios</h4>
+      <ul class="footer-links">
+        <li><a href="#servicios">RHL Express 24h</a></li>
+        <li><a href="#servicios">Transporte Masivo y FTL</a></li>
+        <li><a href="#servicios">Distribución Corporativa</a></li>
+        <li><a href="#servicios">Carga Refrigerada y Especial</a></li>
+        <li><a href="#servicios">Almacenamiento Transitorio</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h4 class="footer-heading">Navegación</h4>
+      <ul class="footer-links">
+        <li><a href="#rastreo">Rastreo de Guías</a></li>
+        <li><a href="#agencias">Nuestras Agencias</a></li>
+        <li><a href="#nosotros">Sobre RHL Express</a></li>
+        <li><a href="#faq">Preguntas Frecuentes</a></li>
+        <li><a routerLink="/login">Portal de Colaboradores</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h4 class="footer-heading">Seguridad & Legal</h4>
+      <ul class="footer-links">
+        <li><a href="#">Términos y Condiciones de Servicio</a></li>
+        <li><a href="#">Política de Privacidad de Datos</a></li>
+        <li><a href="#">Mercancías Prohibidas o Restringidas</a></li>
+        <li><a href="#">Libro de Reclamaciones Virtual</a></li>
+      </ul>
+      <div class="reclamaciones-box">
+        📖 Libro de Reclamaciones Digital
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <div class="rhl-container bottom-inner">
+      <p>© 2026 RHL Express Perú S.A.C. - RUC 20601829401. Todos los derechos reservados.</p>
+    </div>
+  </div>
+</footer>
