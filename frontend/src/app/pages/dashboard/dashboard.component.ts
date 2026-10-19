@@ -160,8 +160,9 @@ export class DashboardComponent implements OnInit {
 
     const val = this.editForm.value;
     const nuevoEstado = val.estado as string;
+    const notas = val.notas ? (val.notas as string).trim() : undefined;
 
-    this.envioService.updateEstado(selected.id, nuevoEstado).subscribe({
+    this.envioService.updateEstado(selected.id, nuevoEstado, notas).subscribe({
       next: (actualizado) => {
         this.envios.update((curr) =>
           curr.map((item) => (item.id === selected.id ? { ...item, estado: actualizado.estado } : item))

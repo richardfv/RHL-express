@@ -71,16 +71,26 @@ public class EnvioService {
 	}
 
 	public EnvioResponse actualizarEstado(Long id, String nuevoEstado) {
+		return actualizarEstado(id, nuevoEstado, null);
+	}
+
+	public EnvioResponse actualizarEstado(Long id, String nuevoEstado, String comentario) {
 		Envio envio = envioRepository.findById(id)
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Envio no encontrado"));
 
 		envio.setEstado(nuevoEstado);
 		Envio actualizado = envioRepository.save(envio);
+
+		String baseMsg = "El paquete cambio de estado a: " + nuevoEstado;
+		String comentarioFinal = (comentario != null && !comentario.trim().isEmpty())
+				? (baseMsg + "\nObservacion: " + comentario.trim())
+				: baseMsg;
+
 		trackingEventProducer.publicarEvento(new EventoTracking(
 				actualizado.getCodigoTracking(),
 				actualizado.getEstado(),
 				"Centro Logistico",
-				"El paquete cambio de estado a: " + nuevoEstado,
+				comentarioFinal,
 				LocalDateTime.now()
 		));
 		return mapToResponse(actualizado);

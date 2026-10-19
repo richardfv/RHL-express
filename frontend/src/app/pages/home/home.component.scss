@@ -69,6 +69,8 @@
   .navbar-brand {
     display: flex;
     align-items: center;
+    cursor: pointer;
+    text-decoration: none;
   }
 
   .brand-logo {
@@ -603,7 +605,9 @@
             .comment {
               font-size: 0.88rem;
               color: #475569;
-              margin-top: 0.15rem;
+              margin-top: 0.25rem;
+              white-space: pre-line;
+              line-height: 1.5;
             }
           }
         }

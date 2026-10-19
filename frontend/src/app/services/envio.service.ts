@@ -22,8 +22,12 @@ export class EnvioService {
     return this.http.post<Envio>(this.API_URL, envio);
   }
 
-  updateEstado(id: number, estado: string): Observable<Envio> {
-    return this.http.put<Envio>(`${this.API_URL}/${id}/estado`, { estado });
+  updateEstado(id: number, estado: string, comentario?: string): Observable<Envio> {
+    const payload: { estado: string; comentario?: string } = { estado };
+    if (comentario && comentario.trim().length > 0) {
+      payload.comentario = comentario.trim();
+    }
+    return this.http.put<Envio>(`${this.API_URL}/${id}/estado`, payload);
   }
 
   deleteEnvio(id: number): Observable<void> {

@@ -171,4 +171,11 @@ export class HomeComponent {
       default: return 25;
     }
   }
+
+  volverAlInicio(event?: Event): void {
+    if (event) {
+      event.preventDefault();
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
 }

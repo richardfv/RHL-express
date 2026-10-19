@@ -54,7 +54,7 @@ public class EnvioController {
 			@PathVariable Long id,
 			@Valid @RequestBody ActualizarEstadoRequest request
 	) {
-		return ResponseEntity.ok(envioService.actualizarEstado(id, request.estado()));
+		return ResponseEntity.ok(envioService.actualizarEstado(id, request.estado(), request.comentario()));
 	}
 
 	@DeleteMapping("/{id}")
