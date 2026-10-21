@@ -1,4 +1,19 @@
 services:
+  mysqldb:
+    image: mysql:8.0
+    container_name: mysqldb
+    ports:
+      - "5510:3306"
+    environment:
+      MYSQL_DATABASE: courier_db
+      MYSQL_USER: app
+      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - courier-net
+
   rabbitmq:
     image: rabbitmq:3-management
     container_name: courier-rabbitmq
@@ -37,6 +52,9 @@ services:
     environment:
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysqldb:3306/courier_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=America/Lima
       - SPRING_RABBITMQ_HOST=rabbitmq
+    depends_on:
+      - mysqldb
+      - rabbitmq
     networks:
       - courier-net
 
@@ -50,11 +68,15 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysqldb:3306/courier_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=America/Lima
       - SPRING_RABBITMQ_HOST=rabbitmq
       - APP_ENVIOS_SERVICE_URL=http://ms-envios:8081
+    depends_on:
+      - mysqldb
+      - rabbitmq
     networks:
       - courier-net
 
 volumes:
   rabbitmq_data:
+  mysql_data:
 
 networks:
   courier-net:
